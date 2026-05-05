@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Link — Indique Mandic Pós Médica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f6fa;--surface:#fff;--surface2:#f0f1f5;
+  --border:#e1e4ed;--text:#1a1d2e;--muted:#6b7280;
+  --accent:#1e4ba8;--accent-hover:#163d8c;
+  --green:#25d366;--green-hover:#1da851;
+  --red:#ef4444;--yellow:#f59e0b;
+  --r:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:520px;margin:0 auto}
+.brand{text-align:center;padding:24px 0 28px}
+.brand-logo{width:60px;height:60px;background:var(--accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:30px;color:#fff;margin-bottom:14px}
+.brand h1{font-size:22px;font-weight:600}
+.brand p{font-size:13px;color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,.04)}
+
+.intro{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{font-size:13px;font-weight:500;display:block;margin-bottom:6px}
+.field input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;transition:border-color .15s;text-align:center;letter-spacing:0.05em}
+.field input:focus{border-color:var(--accent)}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--r);font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-whatsapp{background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-top:10px}
+.btn-whatsapp:hover{background:var(--green-hover)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);margin-top:10px}
+.btn-secondary:hover{background:#e5e7eb}
+
+.loading{text-align:center;padding:40px 20px;color:var(--muted)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.alert{padding:14px 16px;border-radius:var(--r);font-size:14px;line-height:1.5;margin-bottom:16px}
+.alert-error{background:#fee;color:var(--red);border:1px solid #fcc}
+
+.member-card{background:linear-gradient(135deg,#1e4ba8,#2563eb);color:#fff;padding:22px;border-radius:var(--r);margin-bottom:20px;text-align:center}
+.member-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;opacity:.85;font-weight:500}
+.member-name{font-size:20px;font-weight:600;margin-top:4px}
+.member-curso{font-size:13px;opacity:.85;margin-top:2px}
+
+.link-box{background:var(--surface2);border:1px dashed var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;font-family:monospace;font-size:12px;color:var(--accent);word-break:break-all;text-align:center;line-height:1.5}
+
+.success-icon{font-size:48px;text-align:center;margin-bottom:14px}
+.help-text{font-size:13px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.6}
+.help-text strong{color:var(--text)}
+
+.error-state-icon{font-size:48px;text-align:center;margin-bottom:14px;color:var(--yellow)}
+.error-title{font-size:17px;font-weight:600;text-align:center;margin-bottom:8px}
+.error-desc{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="brand">
+    <div class="brand-logo">🩺</div>
+    <h1>Recuperar meu link</h1>
+    <p>Programa Indique Mandic — Pós Médica</p>
+  </div>
+
+  <!-- ESTADO 1: FORMULÁRIO DE BUSCA -->
+  <div class="card" id="state-search">
+    <p class="intro">
+      Perdeu seu link único de indicação? Sem problemas. Digite o seu CPF abaixo e nós recuperamos para você.
+    </p>
+    <form onsubmit="buscarLink(event)">
+      <div class="field">
+        <label for="cpf">Seu CPF</label>
+        <input type="text" id="cpf" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" required>
+      </div>
+      <button type="submit" class="btn btn-primary" id="btn-buscar">Buscar meu link</button>
+    </form>
+    <p class="help-text">
+      Use o CPF cadastrado no momento da sua matrícula na Mandic.
+    </p>
+  </div>
+
+  <!-- ESTADO 2: LOADING -->
+  <div class="card" id="state-loading" style="display:none">
+    <div class="loading">
+      <div class="spinner"></div>
+      Procurando seu cadastro...
+    </div>
+  </div>
+
+  <!-- ESTADO 3: ENCONTRADO -->
+  <div class="card" id="state-found" style="display:none">
+    <div class="success-icon">✅</div>
+    <div class="member-card">
+      <div class="member-label">Olá,</div>
+      <div class="member-name" id="found-nome">—</div>
+      <div class="member-curso" id="found-curso">—</div>
+    </div>
+    <p style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:12px">
+      Este é o seu link único de indicação:
+    </p>
+    <div class="link-box" id="found-link">—</div>
+
+    <button class="btn btn-primary" onclick="copiarLink()" id="btn-copiar">📋 Copiar link</button>
+    <a class="btn btn-whatsapp" id="btn-whats" href="#" target="_blank">
+      📱 Compartilhar no WhatsApp
+    </a>
+    <a class="btn btn-secondary" id="btn-email" href="#">
+      ✉️ Compartilhar por e-mail
+    </a>
+
+    <p class="help-text">
+      <strong>Salve este link em um lugar seguro!</strong><br>
+      Você pode usar quantas vezes quiser para indicar novos colegas.
+    </p>
+
+    <button class="btn btn-secondary" onclick="resetar()" style="margin-top:20px">Buscar outro CPF</button>
+  </div>
+
+  <!-- ESTADO 4: NÃO ENCONTRADO -->
+  <div class="card" id="state-notfound" style="display:none">
+    <div class="error-state-icon">🔍</div>
+    <div class="error-title">Não encontramos seu cadastro</div>
+    <p class="error-desc" id="notfound-msg">
+      O CPF informado não consta em nossa base de membros ativos do programa.
+      Isso pode acontecer se você ainda não foi cadastrado ou se houve algum erro de digitação.
+    </p>
+
+    <a class="btn btn-whatsapp" id="btn-whats-help" href="#" target="_blank">
+      📱 Falar com a Mandic no WhatsApp
+    </a>
+    <button class="btn btn-secondary" onclick="resetar()">Tentar novamente</button>
+
+    <p class="help-text">
+      Nossa equipe da Concierge pode te ajudar a verificar seu cadastro e gerar seu link.
+    </p>
+  </div>
+
+</div>
+
+<script>
+// ⚠️ TROQUE PELA URL DO SEU APPS SCRIPT
+const APPS_SCRIPT     = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';
+const WHATSAPP_MANDIC = '5519999281641';  // só números, com DDI
+
+let MEMBRO_ATUAL = null;
+
+// ── Máscara de CPF ──
+document.getElementById('cpf').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1-$2');
+  e.target.value = v;
+});
+
+// ── Busca link pelo CPF ──
+async function buscarLink(e) {
+  e.preventDefault();
+  const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+  if (cpf.length !== 11) {
+    alert('Digite os 11 dígitos do CPF.');
+    return;
+  }
+
+  document.getElementById('state-search').style.display = 'none';
+  document.getElementById('state-loading').style.display = 'block';
+
+  try {
+    const res = await fetch(APPS_SCRIPT + '?action=lookupMembroPorCPF&cpf=' + cpf);
+    const data = await res.json();
+
+    document.getElementById('state-loading').style.display = 'none';
+
+    if (data.ok && data.membro) {
+      MEMBRO_ATUAL = data.membro;
+      mostrarEncontrado(data.membro);
+    } else {
+      mostrarNaoEncontrado(data.error || 'CPF não encontrado.');
+    }
+  } catch (err) {
+    document.getElementById('state-loading').style.display = 'none';
+    mostrarNaoEncontrado('Erro ao buscar: ' + err.message);
+  }
+}
+
+function mostrarEncontrado(membro) {
+  document.getElementById('found-nome').textContent = capitalize(membro.nome);
+  document.getElementById('found-curso').textContent = membro.curso || '';
+  document.getElementById('found-link').textContent = membro.link;
+
+  const msgWhats = encodeURIComponent(
+    'Olá! Quero te indicar para os cursos de Pós Médica da Faculdade São Leopoldo Mandic. Use o link abaixo para fazer sua inscrição:\n\n' + membro.link
+  );
+  document.getElementById('btn-whats').href = 'https://wa.me/?text=' + msgWhats;
+
+  const subjEmail = encodeURIComponent('Indicação para a Pós Médica Mandic');
+  const corpoEmail = encodeURIComponent(
+    'Olá!\n\nGostaria de te indicar para os cursos de Pós Médica da Faculdade São Leopoldo Mandic.\n\n' +
+    'Acesse o link abaixo para fazer sua inscrição:\n' + membro.link + '\n\nUm abraço!'
+  );
+  document.getElementById('btn-email').href = 'mailto:?subject=' + subjEmail + '&body=' + corpoEmail;
+
+  document.getElementById('state-found').style.display = 'block';
+}
+
+function mostrarNaoEncontrado(msg) {
+  if (msg) document.getElementById('notfound-msg').textContent = msg + ' Se você acredita que isso é um erro, fale com a nossa equipe pelo botão abaixo.';
+  const msgWhats = encodeURIComponent(
+    'Olá! Estou tentando recuperar meu link do programa Indique Mandic - Pós Médica, mas meu CPF não foi localizado. Podem me ajudar?'
+  );
+  document.getElementById('btn-whats-help').href = 'https://wa.me/' + WHATSAPP_MANDIC + '?text=' + msgWhats;
+  document.getElementById('state-notfound').style.display = 'block';
+}
+
+function copiarLink() {
+  if (!MEMBRO_ATUAL) return;
+  navigator.clipboard.writeText(MEMBRO_ATUAL.link).then(() => {
+    const btn = document.getElementById('btn-copiar');
+    const original = btn.textContent;
+    btn.textContent = '✅ Link copiado!';
+    setTimeout(() => btn.textContent = original, 2000);
+  });
+}
+
+function resetar() {
+  document.getElementById('state-found').style.display = 'none';
+  document.getElementById('state-notfound').style.display = 'none';
+  document.getElementById('state-search').style.display = 'block';
+  document.getElementById('cpf').value = '';
+  document.getElementById('cpf').focus();
+  MEMBRO_ATUAL = null;
+}
+
+function capitalize(s) {
+  if (!s) return '—';
+  return String(s).split(' ').map(w => w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+}
+</script>
+</body>
+</html>
