@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indique Mandic — Pós Médica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f6fa;--surface:#fff;--surface2:#f0f1f5;
+  --border:#e1e4ed;--text:#1a1d2e;--muted:#6b7280;
+  --accent:#1e4ba8;--accent-hover:#163d8c;
+  --green:#10b981;--red:#ef4444;
+  --r:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:560px;margin:0 auto}
+.brand{text-align:center;padding:24px 0 32px}
+.brand-logo{width:60px;height:60px;background:var(--accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:30px;color:#fff;margin-bottom:14px}
+.brand h1{font-size:22px;font-weight:600}
+.brand p{font-size:13px;color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,.04)}
+.member-banner{background:linear-gradient(135deg,#1e4ba8,#2563eb);color:#fff;padding:18px 22px;border-radius:var(--r);margin-bottom:24px}
+.member-banner-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;opacity:.85}
+.member-banner-name{font-size:18px;font-weight:600;margin-top:3px}
+.member-banner-sub{font-size:12px;margin-top:2px;opacity:.85}
+.section-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:16px}
+.field label{font-size:13px;font-weight:500;display:block;margin-bottom:6px}
+.field label .req{color:var(--red);margin-left:2px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s;margin-top:8px}
+.btn:hover:not(:disabled){background:var(--accent-hover)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.alert{padding:12px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px;line-height:1.5}
+.alert-error{background:#fee;color:var(--red);border:1px solid #fcc}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.alert-info{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}
+.loading{text-align:center;padding:60px 20px;color:var(--muted)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-icon{font-size:48px;text-align:center;margin-bottom:14px}
+.regulamento{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.6}
+.regulamento a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="brand">
+    <div class="brand-logo">🩺</div>
+    <h1>Indique Mandic — Pós Médica</h1>
+    <p>Indique colegas e ganhe benefícios exclusivos</p>
+  </div>
+
+  <!-- LOADING -->
+  <div class="card" id="state-loading">
+    <div class="loading">
+      <div class="spinner"></div>
+      Validando seu acesso...
+    </div>
+  </div>
+
+  <!-- ERROR (link inválido) -->
+  <div class="card" id="state-error" style="display:none">
+    <div class="alert alert-error" id="error-msg">Link inválido.</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6">
+      Para acessar este formulário, você precisa do <strong>link único</strong> gerado pela equipe Mandic.
+      Se você é aluno e ainda não recebeu seu link, entre em contato com a Concierge.
+    </p>
+  </div>
+
+  <!-- FORM -->
+  <div class="card" id="state-form" style="display:none">
+    <div class="member-banner">
+      <div class="member-banner-label">Indicação por</div>
+      <div class="member-banner-name" id="m-nome">—</div>
+      <div class="member-banner-sub" id="m-curso">—</div>
+    </div>
+
+    <form id="indicacao-form" onsubmit="enviarIndicacao(event)">
+      <div class="section-title">Dados do indicado</div>
+
+      <div class="field">
+        <label>Nome completo<span class="req">*</span></label>
+        <input type="text" id="ind-nome" required autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label>E-mail<span class="req">*</span></label>
+        <input type="email" id="ind-email" required autocomplete="email">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Telefone (WhatsApp)<span class="req">*</span></label>
+          <input type="tel" id="ind-tel" required placeholder="(00) 00000-0000">
+        </div>
+        <div class="field">
+          <label>CPF<span class="req">*</span></label>
+          <input type="text" id="ind-cpf" required placeholder="000.000.000-00">
+        </div>
+      </div>
+
+      <div class="section-title">Curso de interesse</div>
+
+      <div class="field">
+        <label>Curso<span class="req">*</span></label>
+        <select id="curso" required>
+          <option value="">Selecione...</option>
+          <option>Especialização — Ortodontia</option>
+          <option>Especialização — Implantodontia</option>
+          <option>Especialização — Endodontia</option>
+          <option>Mestrado em Ciências Odontológicas</option>
+          <option>Doutorado em Ciências Odontológicas</option>
+          <option>Curso Livre</option>
+          <option>Não tenho certeza</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Unidade de preferência</label>
+        <select id="unidade">
+          <option value="">Selecione...</option>
+          <option>Campinas</option>
+          <option>São Paulo</option>
+          <option>Rio de Janeiro</option>
+          <option>Belo Horizonte</option>
+          <option>Brasília</option>
+          <option>Curitiba</option>
+          <option>Fortaleza</option>
+          <option>Grande Vitória</option>
+          <option>Araras</option>
+          <option>Indiferente</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Observações (opcional)</label>
+        <textarea id="obs" rows="3" placeholder="Algo que possamos saber sobre o indicado..."></textarea>
+      </div>
+
+      <div id="form-msg"></div>
+
+      <button type="submit" class="btn" id="submit-btn">Enviar indicação</button>
+    </form>
+
+    <p class="regulamento">
+      Ao enviar, você confirma que leu e concorda com o <a href="#" target="_blank">Regulamento do Programa</a>.
+      Sua indicação será validada conforme critérios do programa.
+    </p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="card" id="state-success" style="display:none">
+    <div class="success-icon">✅</div>
+    <h2 style="text-align:center;font-size:18px;margin-bottom:8px">Indicação registrada!</h2>
+    <p style="text-align:center;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">
+      Recebemos sua indicação. Nossa equipe entrará em contato com o indicado em breve.
+      Você será comunicado sobre cada etapa do processo.
+    </p>
+    <button class="btn" onclick="location.reload()">Fazer outra indicação</button>
+  </div>
+
+</div>
+
+<script>
+// ⚠️ TROQUE PELA URL DO SEU APPS SCRIPT (Implantar > Aplicativo da Web > URL)
+const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';
+
+let MEMBRO = null;
+
+// 1. Pega o ?ref= da URL
+function getRef() {
+  const p = new URLSearchParams(location.search);
+  return (p.get('ref') || '').trim().toUpperCase();
+}
+
+// 2. No carregamento, valida o membro
+async function init() {
+  const ref = getRef();
+  if (!ref) {
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-error').style.display = 'block';
+    document.getElementById('error-msg').textContent = 'Link sem código de membro. Use o link exclusivo enviado pela Mandic.';
+    return;
+  }
+  try {
+    const res = await fetch(APPS_SCRIPT + '?action=lookupMembro&ref=' + encodeURIComponent(ref));
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Membro não encontrado');
+    MEMBRO = data.membro;
+    document.getElementById('m-nome').textContent = MEMBRO.nome || '—';
+    document.getElementById('m-curso').textContent = MEMBRO.curso || MEMBRO.tipo || '';
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-form').style.display = 'block';
+  } catch (err) {
+    document.getElementById('state-loading').style.display = 'none';
+    document.getElementById('state-error').style.display = 'block';
+    document.getElementById('error-msg').textContent = err.message;
+  }
+}
+
+// 3. Envia a indicação (GET com params para evitar CORS preflight)
+async function enviarIndicacao(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const msgEl = document.getElementById('form-msg');
+  msgEl.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const params = new URLSearchParams({
+    action: 'saveIndicacao',
+    membro_codigo: MEMBRO.codigo,
+    membro_nome: MEMBRO.nome,
+    membro_email: MEMBRO.email,
+    indicado_nome: document.getElementById('ind-nome').value.trim(),
+    indicado_email: document.getElementById('ind-email').value.trim(),
+    indicado_telefone: document.getElementById('ind-tel').value.trim(),
+    indicado_cpf: document.getElementById('ind-cpf').value.trim(),
+    curso_interesse: document.getElementById('curso').value,
+    unidade_interesse: document.getElementById('unidade').value,
+    observacoes: document.getElementById('obs').value.trim(),
+    origem: 'form_link'
+  });
+
+  try {
+    // Usamos no-cors para evitar problema de preflight; resposta não é lida,
+    // mas o Apps Script grava a indicação. Para feedback real, faríamos com fetch normal
+    // e CORS do Apps Script, mas isso exige redeploy específico.
+    await fetch(APPS_SCRIPT + '?' + params.toString(), { mode: 'no-cors' });
+    document.getElementById('state-form').style.display = 'none';
+    document.getElementById('state-success').style.display = 'block';
+  } catch (err) {
+    msgEl.innerHTML = '<div class="alert alert-error">Erro ao enviar: ' + err.message + '</div>';
+    btn.disabled = false;
+    btn.textContent = 'Enviar indicação';
+  }
+}
+
+// Máscaras simples (CPF e telefone)
+document.addEventListener('input', e => {
+  if (e.target.id === 'ind-cpf') {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1-$2');
+    e.target.value = v;
+  }
+  if (e.target.id === 'ind-tel') {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 6) v = v.replace(/(\d{2})(\d{5})(\d)/, '($1) $2-$3');
+    else if (v.length > 2) v = v.replace(/(\d{2})(\d)/, '($1) $2');
+    e.target.value = v;
+  }
+});
+
+init();
+</script>
+</body>
+</html>
