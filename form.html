@@ -21,10 +21,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .brand h1{font-size:22px;font-weight:600}
 .brand p{font-size:13px;color:var(--muted);margin-top:4px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,.04)}
-.member-banner{background:linear-gradient(135deg,#1e4ba8,#2563eb);color:#fff;padding:18px 22px;border-radius:var(--r);margin-bottom:24px}
+.member-banner{background:linear-gradient(135deg,#1e4ba8,#2563eb);color:#fff;padding:18px 22px;border-radius:var(--r);margin-bottom:14px}
 .member-banner-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;opacity:.85}
-.member-banner-name{font-size:18px;font-weight:600;margin-top:3px}
+.member-banner-name{font-size:20px;font-weight:600;margin-top:3px}
 .member-banner-sub{font-size:12px;margin-top:2px;opacity:.85}
+.intro-msg{background:linear-gradient(135deg,#dbeafe,#eef2ff);color:#1e3a8a;padding:16px 18px;border-radius:var(--r);font-size:13.5px;line-height:1.6;margin-bottom:24px;border:1px solid #93c5fd}
+.intro-msg strong{font-weight:600;color:#1e40af}
+.benefit-tag{display:inline-block;background:#10b981;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-right:6px;text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
 .section-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .field{margin-bottom:16px}
 .field label{font-size:13px;font-weight:500;display:block;margin-bottom:6px}
@@ -37,8 +40,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .alert{padding:12px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px;line-height:1.5}
 .alert-error{background:#fee;color:var(--red);border:1px solid #fcc}
-.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
-.alert-info{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}
 .loading{text-align:center;padding:60px 20px;color:var(--muted)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -54,7 +55,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="brand">
     <div class="brand-logo">🩺</div>
     <h1>Indique Mandic — Pós Médica</h1>
-    <p>Indique colegas e ganhe benefícios exclusivos</p>
+    <p>Programa de indicação para alunos e candidatos</p>
   </div>
 
   <!-- LOADING -->
@@ -69,21 +70,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="card" id="state-error" style="display:none">
     <div class="alert alert-error" id="error-msg">Link inválido.</div>
     <p style="font-size:13px;color:var(--muted);line-height:1.6">
-      Para acessar este formulário, você precisa do <strong>link único</strong> gerado pela equipe Mandic.
-      Se você é aluno e ainda não recebeu seu link, entre em contato com a Concierge.
+      Para acessar este formulário, você precisa do <strong>link único</strong> compartilhado por um aluno da Mandic.
+      Se você acredita que isso é um engano, entre em contato com a nossa Concierge.
     </p>
   </div>
 
-  <!-- FORM -->
+  <!-- FORMULÁRIO -->
   <div class="card" id="state-form" style="display:none">
     <div class="member-banner">
-      <div class="member-banner-label">Indicação por</div>
+      <div class="member-banner-label">Você foi indicado por</div>
       <div class="member-banner-name" id="m-nome">—</div>
       <div class="member-banner-sub" id="m-curso">—</div>
     </div>
 
+    <div class="intro-msg">
+      <span class="benefit-tag">Benefício</span>
+      Preencha seus dados abaixo para participar do programa <strong>Indique Mandic</strong> e garanta <strong>até 100% de isenção</strong> em uma das suas mensalidades.
+    </div>
+
     <form id="indicacao-form" onsubmit="enviarIndicacao(event)">
-      <div class="section-title">Dados do indicado</div>
+      <div class="section-title">Seus dados</div>
 
       <div class="field">
         <label>Nome completo<span class="req">*</span></label>
@@ -112,11 +118,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <label>Curso<span class="req">*</span></label>
         <select id="curso" required>
           <option value="">Selecione...</option>
-          <option>Especialização — Ortodontia</option>
-          <option>Especialização — Implantodontia</option>
-          <option>Especialização — Endodontia</option>
-          <option>Mestrado em Ciências Odontológicas</option>
-          <option>Doutorado em Ciências Odontológicas</option>
+          <option>Especialização — Cardiologia</option>
+          <option>Especialização — Ortopedia</option>
+          <option>Especialização — Pediatria</option>
+          <option>Especialização — Dermatologia</option>
+          <option>Especialização — Ginecologia</option>
+          <option>Mestrado em Ciências Médicas</option>
+          <option>Doutorado em Ciências Médicas</option>
           <option>Curso Livre</option>
           <option>Não tenho certeza</option>
         </select>
@@ -141,52 +149,51 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
       <div class="field">
         <label>Observações (opcional)</label>
-        <textarea id="obs" rows="3" placeholder="Algo que possamos saber sobre o indicado..."></textarea>
+        <textarea id="obs" rows="3" placeholder="Algo que possamos saber..."></textarea>
       </div>
 
       <div id="form-msg"></div>
 
-      <button type="submit" class="btn" id="submit-btn">Enviar indicação</button>
+      <button type="submit" class="btn" id="submit-btn">Quero participar</button>
     </form>
 
     <p class="regulamento">
       Ao enviar, você confirma que leu e concorda com o <a href="#" target="_blank">Regulamento do Programa</a>.
-      Sua indicação será validada conforme critérios do programa.
+      Os benefícios estão sujeitos às condições previstas no regulamento.
     </p>
   </div>
 
   <!-- SUCCESS -->
   <div class="card" id="state-success" style="display:none">
     <div class="success-icon">✅</div>
-    <h2 style="text-align:center;font-size:18px;margin-bottom:8px">Indicação registrada!</h2>
-    <p style="text-align:center;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">
-      Recebemos sua indicação. Nossa equipe entrará em contato com o indicado em breve.
-      Você será comunicado sobre cada etapa do processo.
+    <h2 style="text-align:center;font-size:18px;margin-bottom:8px">Cadastro realizado!</h2>
+    <p style="text-align:center;font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:8px">
+      Recebemos seus dados. Nosso time entrará em contato em breve para apresentar as opções de cursos e detalhes do benefício.
     </p>
-    <button class="btn" onclick="location.reload()">Fazer outra indicação</button>
+    <p style="text-align:center;font-size:12px;color:var(--muted);line-height:1.5;margin-top:14px">
+      Você pode fechar esta página.
+    </p>
   </div>
 
 </div>
 
 <script>
-// ⚠️ TROQUE PELA URL DO SEU APPS SCRIPT (Implantar > Aplicativo da Web > URL)
+// ⚠️ TROQUE PELA URL DO SEU APPS SCRIPT
 const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';
 
 let MEMBRO = null;
 
-// 1. Pega o ?ref= da URL
 function getRef() {
   const p = new URLSearchParams(location.search);
   return (p.get('ref') || '').trim().toUpperCase();
 }
 
-// 2. No carregamento, valida o membro
 async function init() {
   const ref = getRef();
   if (!ref) {
     document.getElementById('state-loading').style.display = 'none';
     document.getElementById('state-error').style.display = 'block';
-    document.getElementById('error-msg').textContent = 'Link sem código de membro. Use o link exclusivo enviado pela Mandic.';
+    document.getElementById('error-msg').textContent = 'Link sem código de membro. Use o link exclusivo compartilhado por um aluno da Mandic.';
     return;
   }
   try {
@@ -205,7 +212,6 @@ async function init() {
   }
 }
 
-// 3. Envia a indicação (GET com params para evitar CORS preflight)
 async function enviarIndicacao(e) {
   e.preventDefault();
   const btn = document.getElementById('submit-btn');
@@ -226,24 +232,20 @@ async function enviarIndicacao(e) {
     curso_interesse: document.getElementById('curso').value,
     unidade_interesse: document.getElementById('unidade').value,
     observacoes: document.getElementById('obs').value.trim(),
-    origem: 'form_link'
+    origem: 'self_service'
   });
 
   try {
-    // Usamos no-cors para evitar problema de preflight; resposta não é lida,
-    // mas o Apps Script grava a indicação. Para feedback real, faríamos com fetch normal
-    // e CORS do Apps Script, mas isso exige redeploy específico.
     await fetch(APPS_SCRIPT + '?' + params.toString(), { mode: 'no-cors' });
     document.getElementById('state-form').style.display = 'none';
     document.getElementById('state-success').style.display = 'block';
   } catch (err) {
     msgEl.innerHTML = '<div class="alert alert-error">Erro ao enviar: ' + err.message + '</div>';
     btn.disabled = false;
-    btn.textContent = 'Enviar indicação';
+    btn.textContent = 'Quero participar';
   }
 }
 
-// Máscaras simples (CPF e telefone)
 document.addEventListener('input', e => {
   if (e.target.id === 'ind-cpf') {
     let v = e.target.value.replace(/\D/g, '').slice(0, 11);
