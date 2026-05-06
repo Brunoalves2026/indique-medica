@@ -498,8 +498,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 // ═══════════════════════════════════════════════════════════
 // ⚠️ CONFIGURAÇÃO — TROQUE A URL ABAIXO
 // ═══════════════════════════════════════════════════════════
-const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';
-const FORM_BASE   = 'https://brunoalves2026.github.io/indique-medica/form.html'; // URL pública do form
+const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';;
+const TOKEN_ADMIN = 'mandic-admin-2026-x7K9pQ3vL2wN8mF4';  // mesmo token do Codigo.gs
+const FORM_BASE   = 'https://SEU-USUARIO.github.io/indique-medica/form.html'; // URL pública do form
 
 const SENHAS = {
   'admin2025':    { role:'admin',    label:'Administrador' },
@@ -589,7 +590,7 @@ async function loadData() {
   badge.textContent = 'Carregando...';
 
   try {
-    const res = await fetch(APPS_SCRIPT + '?t=' + Date.now());
+    const res = await fetch(APPS_SCRIPT + '?t=' + Date.now() + '&token=' + encodeURIComponent(TOKEN_ADMIN));
     const json = await res.json();
     if (json.error) throw new Error(json.error);
     DATA = {
@@ -851,6 +852,7 @@ async function confirmarBeneficio() {
 
   const params = new URLSearchParams({
     action: 'registrarBeneficio',
+    token: TOKEN_ADMIN,
     indicacao_id: modalCtx.indicacao_id,
     membro_codigo: ind.membro_codigo || '',
     membro_email: ind.membro_email || '',
@@ -909,6 +911,7 @@ async function confirmarExcecao() {
   if (!desc || !resp) { err.textContent = 'Preencha descrição e responsável.'; return; }
   const params = new URLSearchParams({
     action: 'salvarExcecao',
+    token: TOKEN_ADMIN,
     indicacao_id: modalCtx.indicacao_id,
     tipo_excecao: tipo,
     descricao: desc,
