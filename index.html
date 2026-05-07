@@ -203,9 +203,33 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <p>Backoffice — Acesso restrito</p>
       </div>
     </div>
-    <label class="login-label">Senha de acesso</label>
-    <input class="login-input" id="pwd" type="password" placeholder="Digite sua senha..." onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Entrar</button>
+
+    <!-- Etapa 1: clicar para abrir o Google -->
+    <div id="login-step-1">
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;text-align:center">
+        Acesso protegido por Google.<br>
+        Use sua conta autorizada da Mandic.
+      </p>
+      <button class="login-btn" onclick="abrirLoginGoogle()" style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M16.51 8.18c0-.46-.04-.93-.13-1.39H9v2.62h4.21c-.18.97-.74 1.79-1.57 2.34v1.95h2.54c1.49-1.37 2.33-3.4 2.33-5.52z"/><path fill="#fff" d="M9 16c2.13 0 3.92-.7 5.22-1.91l-2.54-1.95c-.71.48-1.62.76-2.68.76-2.06 0-3.8-1.39-4.42-3.26H1.94v2.01C3.25 14.27 5.94 16 9 16z" opacity=".8"/><path fill="#fff" d="M4.58 9.65c-.16-.48-.25-.99-.25-1.51s.09-1.04.25-1.51V4.62H1.94C1.34 5.81 1 7.16 1 8.59s.34 2.78.94 3.97l2.64-2.91z" opacity=".6"/><path fill="#fff" d="M9 3.58c1.16 0 2.21.4 3.03 1.18l2.27-2.27C12.92.81 11.13 0 9 0 5.94 0 3.25 1.73 1.94 4.62l2.64 2.01C5.2 4.97 6.94 3.58 9 3.58z" opacity=".7"/></svg>
+        Entrar com Google
+      </button>
+    </div>
+
+    <!-- Etapa 2: voltar e confirmar -->
+    <div id="login-step-2" style="display:none">
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;text-align:center">
+        Após fazer login na nova aba do Google,<br>
+        clique no botão abaixo para continuar.
+      </p>
+      <button class="login-btn" id="btn-verificar" onclick="verificarLogin()">
+        Já fiz login, continuar
+      </button>
+      <button class="login-btn" onclick="document.getElementById('login-step-1').style.display='block'; document.getElementById('login-step-2').style.display='none'; document.getElementById('login-err').textContent='';" style="background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:8px">
+        Voltar
+      </button>
+    </div>
+
     <div class="login-error" id="login-err"></div>
   </div>
 </div>
@@ -496,17 +520,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// ⚠️ CONFIGURAÇÃO — TROQUE A URL ABAIXO
+// ⚠️ CONFIGURAÇÃO
 // ═══════════════════════════════════════════════════════════
-const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwvI8LvzJfvauuWi-fNuuV-GeVQg_NDpUNA1MGgqRbqd3lpVB4nD5wvLHzyezDBgdCF/exec';;
-const TOKEN_ADMIN = 'mandic-admin-2026-x7K9pQ3vL2wN8mF4';  // mesmo token do Codigo.gs
-const FORM_BASE   = 'https://SEU-USUARIO.github.io/indique-medica/form.html'; // URL pública do form
-
-const SENHAS = {
-  'admin2025':    { role:'admin',    label:'Administrador' },
-  'gerencia2025': { role:'gerencia', label:'Gerência' },
-  'equipe2025':   { role:'colab',    label:'Colaborador' }
-};
+// URL do Apps Script ADMIN (com login Google)
+const APPS_SCRIPT_ADMIN = 'https://script.google.com/macros/s/AKfycbxIhwBcl8It0EYmCEmX9OZjY2eCInYwT6lCMD5vd9B7wz0YvBag7xYSmmocdH1GZvGq/exec';
+const FORM_BASE = 'https://brunoalves2026.github.io/indique-medica/form.html';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -517,37 +535,73 @@ let dashFilter = 'todos';
 let modalCtx = null;
 
 // ═══════════════════════════════════════════════════════════
-// LOGIN
+// LOGIN GOOGLE OAUTH
 // ═══════════════════════════════════════════════════════════
-function doLogin() {
-  const pwd = document.getElementById('pwd').value.trim();
-  const m = SENHAS[pwd];
-  if (!m) {
-    document.getElementById('login-err').textContent = 'Senha incorreta.';
-    document.getElementById('pwd').value = '';
-    return;
+function abrirLoginGoogle() {
+  // Abre a URL do Apps Script numa nova aba — Google obriga login
+  window.open(APPS_SCRIPT_ADMIN + '?action=whoami', '_blank');
+  // Mostra instrução para o usuário voltar e clicar "Já fiz login"
+  document.getElementById('login-step-1').style.display = 'none';
+  document.getElementById('login-step-2').style.display = 'block';
+}
+
+async function verificarLogin() {
+  const btnVerificar = document.getElementById('btn-verificar');
+  const errEl = document.getElementById('login-err');
+  errEl.textContent = '';
+  btnVerificar.disabled = true;
+  btnVerificar.textContent = 'Verificando...';
+
+  try {
+    const res = await fetch(APPS_SCRIPT_ADMIN + '?action=whoami');
+    const data = await res.json();
+
+    if (data.ok && data.usuario) {
+      SESSION = {
+        email: data.usuario.email,
+        nome: data.usuario.nome,
+        role: data.usuario.perfil,
+        label: data.usuario.nome
+      };
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      setupUI();
+      loadData();
+    } else if (data.error === 'AUTH_REQUIRED') {
+      errEl.textContent = 'Você precisa fazer login com Google primeiro. Clique em "Entrar com Google" acima.';
+      document.getElementById('login-step-1').style.display = 'block';
+      document.getElementById('login-step-2').style.display = 'none';
+    } else {
+      errEl.textContent = data.mensagem || 'Acesso negado.';
+    }
+  } catch (err) {
+    errEl.textContent = 'Erro ao verificar: ' + err.message;
+  } finally {
+    btnVerificar.disabled = false;
+    btnVerificar.textContent = 'Já fiz login, continuar';
   }
-  SESSION = m;
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  setupUI();
-  loadData();
 }
 
 function doLogout() {
+  // Logout do portal (não desloga do Google em si)
   SESSION = null;
-  document.getElementById('pwd').value = '';
   document.getElementById('login-err').textContent = '';
   document.getElementById('login').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
+  document.getElementById('login-step-1').style.display = 'block';
+  document.getElementById('login-step-2').style.display = 'none';
 }
 
 function setupUI() {
   const isAdmin = SESSION.role === 'admin';
   const av = document.getElementById('user-avatar');
-  av.textContent = SESSION.label[0];
+  av.textContent = (SESSION.label || '?')[0].toUpperCase();
   document.getElementById('user-name').textContent = SESSION.label;
-  document.getElementById('user-role').textContent = isAdmin ? 'Acesso total' : (SESSION.role === 'gerencia' ? 'Aprovação' : 'Consulta');
+  document.getElementById('user-role').textContent = (
+    SESSION.role === 'admin' ? 'Administrador' :
+    SESSION.role === 'gerencia' ? 'Gerência' :
+    'Colaborador'
+  );
 
   document.getElementById('admin-section').style.display = isAdmin ? 'block' : 'none';
   document.getElementById('nav-membros').style.display = isAdmin ? 'flex' : 'none';
@@ -590,7 +644,7 @@ async function loadData() {
   badge.textContent = 'Carregando...';
 
   try {
-    const res = await fetch(APPS_SCRIPT + '?t=' + Date.now() + '&token=' + encodeURIComponent(TOKEN_ADMIN));
+    const res = await fetch(APPS_SCRIPT_ADMIN + '?t=' + Date.now());
     const json = await res.json();
     if (json.error) throw new Error(json.error);
     DATA = {
@@ -852,7 +906,6 @@ async function confirmarBeneficio() {
 
   const params = new URLSearchParams({
     action: 'registrarBeneficio',
-    token: TOKEN_ADMIN,
     indicacao_id: modalCtx.indicacao_id,
     membro_codigo: ind.membro_codigo || '',
     membro_email: ind.membro_email || '',
@@ -866,7 +919,7 @@ async function confirmarBeneficio() {
   });
 
   try {
-    await fetch(APPS_SCRIPT + '?' + params.toString(), { mode: 'no-cors' });
+    await fetch(APPS_SCRIPT_ADMIN + '?' + params.toString(), { mode: 'no-cors' });
     fecharModal('modal-beneficio');
     setTimeout(loadData, 800); // recarrega após gravar
   } catch (e) {
@@ -911,7 +964,6 @@ async function confirmarExcecao() {
   if (!desc || !resp) { err.textContent = 'Preencha descrição e responsável.'; return; }
   const params = new URLSearchParams({
     action: 'salvarExcecao',
-    token: TOKEN_ADMIN,
     indicacao_id: modalCtx.indicacao_id,
     tipo_excecao: tipo,
     descricao: desc,
@@ -919,7 +971,7 @@ async function confirmarExcecao() {
     responsavel: resp
   });
   try {
-    await fetch(APPS_SCRIPT + '?' + params.toString(), { mode: 'no-cors' });
+    await fetch(APPS_SCRIPT_ADMIN + '?' + params.toString(), { mode: 'no-cors' });
     fecharModal('modal-excecao');
     setTimeout(loadData, 800);
   } catch (e) {
